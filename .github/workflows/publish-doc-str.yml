@@ -54,10 +54,17 @@ jobs:
         }
       shell: pwsh
 
-    # STEP 3: Copy files to a storage account
-    - name: Copy files to a storage account
-      uses: bacongobbler/azure-blob-storage-upload@v1.1.1
+    # STEP 3: Copy files to a storage account. upload to the $web container
+    - name: Copy files to a storage account. upload to the $web container
+      uses: azure/CLI@v1
       with:
-        connection_string: ${{ secrets.STORAGEACCOUNTSECRET }}
-        container_name: ps-docs
-        source_dir: 'out/docs/*'
+        inlineScript: |
+            az storage blob upload-batch --account-name ${{ env.STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s out/docs/
+
+    # # STEP 3: Copy files to a storage account
+    # - name: Copy files to a storage account
+    #   # uses: bacongobbler/azure-blob-storage-upload@v1.1.1
+    #   # with:
+    #   #   connection_string: ${{ secrets.STORAGEACCOUNTSECRET }}
+    #   #   container_name: ps-docs
+    #   #   source_dir: 'out/docs/*'

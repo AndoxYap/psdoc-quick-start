@@ -14,11 +14,13 @@
 # - DOCS_RESOURCE_GROUP - The name of the resource group containing the web app.
 # - DOCS_SUBSCRIPTION - The name or id of the subscription to use for deploying the web app.
 
-name: Publish docs
+name: Publish docs to staticweb
 
 on:
-- push
-- workflow_dispatch
+ push:
+  branches:
+    - master
+ workflow_dispatch:
 
 jobs:
   publish:

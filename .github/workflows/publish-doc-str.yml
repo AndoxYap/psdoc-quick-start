@@ -19,25 +19,26 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    # STEP 1: Generate arm templates from bicep with bicep cli
     - name: Azure Bicep Build
       run: |
         az bicep build --file templates/deploy.bicep
 
-    # STEP 1: Generate arm templates from bicep with bicep cli
-    - name:  Generate arm templates
-      run: | 
-        Install-Module -Name 'PSDocs.Azure' -Repository PSGallery -force;
-        # Scan for Azure template file recursively in the templates/ directory
-        Get-AzDocTemplateFile -Path templates/ | ForEach-Object {
-          # Generate a standard name of the markdown file. i.e. <name>_<version>.md
-          $template = Get-Item -Path $_.TemplateFile;
-          $templateName = $template.Directory.Parent.Name;
-          $version = $template.Directory.Name;
-          $docName = "$($templateName)_$version";
-          # Generate markdown
-          Invoke-PSDocument -Module PSDocs.Azure -OutputPath out/docs/ -InputObject $template.FullName -InstanceName $docName;
-        }
-      shell: pwsh
+    # # STEP 1: Generate arm templates from bicep with bicep cli
+    # - name:  Generate arm templates
+    #   run: | 
+    #     Install-Module -Name 'PSDocs.Azure' -Repository PSGallery -force;
+    #     # Scan for Azure template file recursively in the templates/ directory
+    #     Get-AzDocTemplateFile -Path templates/ | ForEach-Object {
+    #       # Generate a standard name of the markdown file. i.e. <name>_<version>.md
+    #       $template = Get-Item -Path $_.TemplateFile;
+    #       $templateName = $template.Directory.Parent.Name;
+    #       $version = $template.Directory.Name;
+    #       $docName = "$($templateName)_$version";
+    #       # Generate markdown
+    #       Invoke-PSDocument -Module PSDocs.Azure -OutputPath out/docs/ -InputObject $template.FullName -InstanceName $docName;
+    #     }
+    #   shell: pwsh
 
     # STEP 2: Generate Markdowns using PSDocs
     - name: Generate ARM markdowns
@@ -57,10 +58,12 @@ jobs:
 
     # STEP 3: Copy files to a storage account. upload to the $web container
     - name: Copy files to a storage account. upload to the $web container
+      env: 
+        STORAGE_ACCOUNT_NAME: ${{ secrets.STORAGE_ACCOUNT_NAME }}
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name ${{ env.STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s out/docs/
+            az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} --auth-mode key -d '$web' -s out/docs/
 
     # # STEP 3: Copy files to a storage account
     # - name: Copy files to a storage account

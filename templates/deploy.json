@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.12.40.16777",
+      "templateHash": "4818474263058831883"
+    }
+  },
+  "parameters": {
+    "acrName": {
+      "type": "string",
+      "defaultValue": "[format('acr{0}', uniqueString(resourceGroup().id))]",
+      "metadata": {
+        "description": "A globally unique name of your Azure Container Registry"
+      },
+      "maxLength": 50,
+      "minLength": 5
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for the registry."
+      }
+    },
+    "acrSku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "metadata": {
+        "description": "Tier of your Azure Container Registry."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[parameters('acrName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('acrSku')]"
+      },
+      "properties": {
+        "adminUserEnabled": false
+      },
+      "metadata": {
+        "description": "Creates or update a Azure Container Registry."
+      }
+    }
+  ],
+  "outputs": {
+    "loginServer": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries', parameters('acrName')), '2021-06-01-preview').loginServer]",
+      "metadata": {
+        "description": "Output the login server property for later use"
+      }
+    }
+  }
+}

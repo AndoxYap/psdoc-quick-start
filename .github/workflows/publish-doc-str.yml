@@ -1,0 +1,29 @@
+name: Publish docs
+on:
+  push:
+    branches: [ main ]
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    # Generate markdown files using PSDocs
+    # Scan for Azure template file recursively in the templates/ directory
+    # Then generate a docs using a standard naming convention. i.e. <name>_<version>.md
+    - name: Generate docs
+      run: |
+        Install-Module -Name 'PSDocs.Azure' -Repository PSGallery -Force;
+        Get-AzDocTemplateFile -Path templates/ | ForEach-Object {
+          Invoke-PSDocument -Module PSDocs.Azure -OutputPath out/docs/ -InputObject $_.TemplateFile -Convention 'Azure.NameByParentPath';
+        }
+      shell: pwsh
+
+    - name: 'Copy files to Azure Storage'
+      uses: bacongobbler/azure-blob-storage-upload@v1.1.1
+      with:
+        connection_string: ${{ secrets.STORAGE_ACCOUNT_SECRET }}
+        container_name: docs
+        source_dir: 'out/docs/*'

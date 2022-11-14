@@ -63,7 +63,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-            az storage blob upload-batch --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} --auth-mode key -d 'test-publicurl' -s out/docs/
+            az storage blob upload-batch --account-name ${{ env.STORAGE_ACCOUNT_NAME }} --auth-mode key -d ${{ env.STORAGE_CONTAINER_NAME }} -s out/docs/
 
     # # STEP 3: Copy files to a storage account
     # - name: Copy files to a storage account

@@ -56,8 +56,8 @@ jobs:
         }
       shell: pwsh
 
-    # STEP 3: Copy files to a storage account. upload to the $web container
-    - name: Copy files to a storage account. upload to the $web container
+    # STEP 3: Copy files to a storage account. upload to the STORAGE_CONTAINER_NAME container
+    - name: Copy files to a storage account. upload to the STORAGE_CONTAINER_NAME container
       env: 
         STORAGE_ACCOUNT_NAME: ${{ secrets.STORAGE_ACCOUNT_NAME }}
       uses: azure/CLI@v1

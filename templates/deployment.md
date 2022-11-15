@@ -13,10 +13,22 @@ az deployment group what-if --resource-group bicep-acr-rg --template-file ACR-ba
 ## Generate arm templates from bicep with bicep cli
 
     az bicep build --file templates/deploy.bicep
+### multi layer modules (bhi core) https://stackoverflow.com/questions/71940586/publish-multiple-bicep-templates-to-a-container-registry
+cd to "D:\OwnRepo\SoftwareEngineer\Full Time\RPS\NewBHI\newbhi-core-infrastructure\bicep"
+ $modules = Get-ChildItem -Path .\modules\*.bicep -Recurse -Force -Exclude *.tests.bicep
+        foreach ($module in $modules){
+             az bicep build --file $module
+        } 
+
+            <!-- $moduleName = $module.BaseName.ToLower() -->
+            <!-- Write-Host "Adding new module ${moduleName} with version $version" -->
+            <!-- az bicep publish --file $module.FullName --target br:${registryName}.azurecr.io/bicep/modules/${moduleName}:${version} -->
 
 ## psdoc out template Docs
 
+Set-Location -Path "D:\OwnRepo\SoftwareEngineer\Full Time\RPS\NewBHI\newbhi-core-infrastructure\bicep"
+
 Install-Module -Name 'PSDocs.Azure' -Repository PSGallery -Force;
-Get-AzDocTemplateFile -Path templates/ | ForEach-Object {
+Get-AzDocTemplateFile -Path modules/ | ForEach-Object {
 Invoke-PSDocument -Module PSDocs.Azure -OutputPath out/docs/ -InputObject $\_.TemplateFile -Convention 'Azure.NameByParentPath';
 }
